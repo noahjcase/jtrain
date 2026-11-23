@@ -9,6 +9,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import duckdb
+import httpx
 import numpy as np
 import pytest
 
@@ -230,6 +231,48 @@ class FakeLLM:
 @pytest.fixture
 def fake_llm() -> FakeLLM:
     return FakeLLM()
+
+
+# ---------------------------------------------------------------------------
+# fake HTTP
+
+
+class FakeHTTP:
+    """httpx.MockTransport serving fixtures/jarchive, recording requests with fake-clock times.
+    `statuses[path]` can queue status codes to return before serving the file."""
+
+    ROUTES = {
+        "/robots.txt": "robots.txt",
+        "/showseason.php?season=41": "season_41.html",
+        "/showgame.php?game_id=8915": "game_complete.html",
+        "/showgame.php?game_id=8916": "game_tiebreaker.html",
+        "/showgame.php?game_id=8917": "game_unrevealed_old_layout.html",
+    }
+
+    def __init__(self, clock: FakeClock):
+        self.clock = clock
+        self.requests: list[tuple[str, int]] = []  # (path, monotonic ms)
+        self.statuses: dict[str, list[int]] = {}
+        self.transport = httpx.MockTransport(self.handle)
+
+    def handle(self, request: httpx.Request) -> httpx.Response:
+        path = request.url.raw_path.decode()
+        self.requests.append((path, self.clock.monotonic_ms()))
+        queued = self.statuses.get(path)
+        if queued:
+            return httpx.Response(queued.pop(0), text="")
+        name = self.ROUTES.get(path)
+        if name is None:
+            return httpx.Response(404, text="not found")
+        return httpx.Response(200, text=(FIXTURES / "jarchive" / name).read_text())
+
+    def paths(self) -> list[str]:
+        return [p for p, _ in self.requests]
+
+
+@pytest.fixture
+def fake_http(clock) -> FakeHTTP:
+    return FakeHTTP(clock)
 
 
 # ---------------------------------------------------------------------------
