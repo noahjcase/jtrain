@@ -1,0 +1,28 @@
+name: ci
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 7 * * *"   # nightly slow suite
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -n auto --cov=jtrainer --cov-branch --cov-report=json --cov-report=term
+      - run: uv run python scripts/check_coverage.py coverage.json
+
+  slow:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --dev
+      - run: uv run pytest -m slow
