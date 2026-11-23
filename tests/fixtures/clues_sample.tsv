@@ -1,0 +1,74 @@
+round	clue_value	daily_double_value	category	comments	answer	question	air_date	notes
+# Lines starting with '#' document the row(s) that follow and are skipped by ingest.
+# Pre-doubling era game 1999-05-10: every J! value (rows 1-5) in board order.
+1	100	0	U.S. PRESIDENTS		He was the 16th president of the United States	(Abraham) Lincoln	1999-05-10	
+1	200	0	U.S. PRESIDENTS		This 2nd president was the first to live in the White House	John Adams	1999-05-10	
+1	300	0	U.S. PRESIDENTS		The 6th president, he was the son of the 2nd	John Quincy Adams	1999-05-10	
+1	400	0	U.S. PRESIDENTS		"Old Hickory" was this president's nickname	Andrew Jackson	1999-05-10	
+1	500	0	U.S. PRESIDENTS		He was the first president born in the 20th century	John F. Kennedy	1999-05-10	
+# Second J! category on the same date (category order follows source order).
+1	100	0	WORLD CAPITALS		This capital of France is on the Seine	Paris   	1999-05-10	
+1	200	0	WORLD CAPITALS		Canberra is the capital of this country	Australia	1999-05-10	
+# Pre-doubling era: every DJ! value (rows 1-5).
+2	200	0	THE ELEMENTS		Element with the symbol Au	gold	1999-05-10	
+2	400	0	THE ELEMENTS		This element's atomic number is 1	hydrogen	1999-05-10	
+2	600	0	THE ELEMENTS		Named for a planet, element 94	plutonium	1999-05-10	
+2	800	0	THE ELEMENTS		Element with the symbol Fe	iron	1999-05-10	
+2	1000	0	THE ELEMENTS		Mercury's symbol, Hg, comes from this Latinized Greek word	hydrargyrum	1999-05-10	
+# Final Jeopardy!, pre-doubling era.
+3	0	0	ART		His "The Persistence of Memory" features melting watches	Salvador Dalí	1999-05-10	
+# Last pre-doubling date (Friday 2001-11-23): J! $100 is row 1.
+1	100	0	POTPOURRI		The Red Planet	Mars (or the Red Planet)	2001-11-23	
+# ON the doubling date 2001-11-26: every J! value (rows 1-5) in the new era.
+1	200	0	OPERA		Verdi opera about an Ethiopian princess	Aida	2001-11-26	
+1	400	0	OPERA		Bizet opera set in Seville	Carmen	2001-11-26	
+1	600	0	OPERA		Puccini opera about Mimi and Rodolfo	La Boheme	2001-11-26	
+1	800	0	OPERA		Mozart opera about a womanizing nobleman	Don Giovanni	2001-11-26	
+1	1000	0	OPERA		Wagner's 4-opera cycle	The Ring of the Nibelung	2001-11-26	
+# ON the doubling date: every DJ! value (rows 1-5).
+2	400	0	THE BIBLE		He built the ark	Noah	2001-11-26	
+2	800	0	THE BIBLE		First book of the Bible	Genesis	2001-11-26	
+2	1200	0	THE BIBLE		He was swallowed by a great fish	Jonah	2001-11-26	
+2	1600	0	THE BIBLE		Brother of Moses who made the golden calf	Aaron	2001-11-26	
+2	2000	0	THE BIBLE		The shortest book of the Old Testament	Obadiah	2001-11-26	
+# Final Jeopardy!, new era.
+3	0	0	MUSEUMS		Home of the Mona Lisa since 1797	the Louvre (Museum)	2001-11-26	
+# Daily Doubles: one per round and era. clue_value is the board value; daily_double_value the wager.
+1	300	1500	FAMOUS NAMES		Gettysburg Address orator	Abraham Lincoln	1999-05-11	
+2	800	2500	LITERATURE		Author of "Crime and Punishment"	Fyodor Dostoevsky	1999-05-11	
+1	600	2000	MUSIC		Composer of "The Nutcracker"	Tchaikovsky	2005-03-14	
+2	1200	5000	GEOGRAPHY		The largest country by area	Russia	2005-03-14	
+# Data error: a value outside the valid set for its round and era (J! $300 after 2001).
+1	300	0	ODDITIES		An off-grid value	an error	2005-03-14	
+# Missing value.
+1		0	ODDITIES		A clue with no recorded value	nothing	2005-03-14	
+# Tournament levels flagged via notes: kids, teen, college. Tournament of Champions is NOT flagged.
+1	200	0	ANIMALS		A baby cat	a kitten	2010-02-01	2010 Kids Week game 3.
+1	400	0	ANIMALS		A baby dog	a puppy	2008-02-04	2008-A Teen Tournament quarterfinal game 2.
+1	600	0	ANIMALS		A baby goat	a kid	2009-02-02	2009 College Championship semifinal game 2.
+1	800	0	ANIMALS		A baby kangaroo	a joey	2011-05-02	2011 Tournament of Champions quarterfinal game 1.
+# Media-dependent clues: Clue Crew, seen here, heard here, shown here.
+1	200	0	SCIENCE		(Sarah of the Clue Crew shows a beaker.) This gas is bubbling here	carbon dioxide	2012-01-02	
+1	400	0	PAINTINGS		The artist of the self-portrait seen here	Vincent van Gogh	2012-01-02	
+1	600	0	INSTRUMENTS		The instrument heard here	the oboe	2012-01-02	
+1	800	0	MAPS		The country shown here in red	Chile	2012-01-02	
+# Near miss: 'crew' in an unrelated sense must NOT be flagged.
+1	1000	0	SHIPS		This ship's crew mutinied against Captain Bligh in 1789	the Bounty	2012-01-02	
+# Text cleaning: HTML entities, escaped quotes, accents (Dalí above), trailing whitespace (Paris above).
+2	400	0	BRAZIL		"The Girl from Ipanema" composer	Ant&ocirc;nio Carlos Jobim	2015-06-01	
+2	800	0	80s MUSIC		Video in which Michael Jackson becomes a zombie	\"Thriller\"	2015-06-01	
+2	1200	0	NOVELS		Orwell's dystopian novel	Nineteen Eighty-Four	2015-06-01	
+2	1600	0	PEOPLE		Assassinated in Dallas in 1963	John F. Kennedy	2015-06-01	
+2	2000	0	GEOGRAPHY		This island nation is also a continent	Australia	2015-06-01	
+# Exact duplicate row (dedup test): the next row repeats the previous one.
+2	2000	0	GEOGRAPHY		This island nation is also a continent	Australia	2015-06-01	
+# Same clue text, different response (NOT a duplicate).
+1	400	0	POKER		What's this?	a flush	2012-09-17	
+1	600	0	POKER		What's this?	a full house	2012-09-17	
+# Filler: a current-era category for synthetic boards and finals.
+1	200	0	FRUIT		A yellow fruit monkeys love	a banana	2015-06-02	
+1	400	0	FRUIT		Fruit of the Malus genus	an apple	2015-06-02	
+1	600	0	FRUIT		Citrus fruit named for a color	an orange	2015-06-02	
+1	800	0	FRUIT		Wine is made from these	grapes	2015-06-02	
+1	1000	0	FRUIT		Spiky tropical fruit	a pineapple	2015-06-02	
+3	0	0	WORLD LEADERS		He was Britain's PM for most of World War II	Winston Churchill	2015-06-02	

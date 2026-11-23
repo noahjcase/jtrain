@@ -26,6 +26,10 @@ from jtrainer.config import (
     Taxonomy,
 )
 
+FIXTURES = Path(__file__).parent / "fixtures"
+SAMPLE_TSV = FIXTURES / "clues_sample.tsv"
+
+
 # ---------------------------------------------------------------------------
 # config, rng, clock
 
