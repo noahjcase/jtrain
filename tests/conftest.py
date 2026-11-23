@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import os
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -143,3 +144,16 @@ class FakeLLM:
 @pytest.fixture
 def fake_llm() -> FakeLLM:
     return FakeLLM()
+
+
+# ---------------------------------------------------------------------------
+# live marker: skip (not fail) without a key
+
+
+def pytest_collection_modifyitems(config, items):
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return
+    skip = pytest.mark.skip(reason="ANTHROPIC_API_KEY not set")
+    for item in items:
+        if "live" in item.keywords:
+            item.add_marker(skip)

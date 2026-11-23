@@ -1,0 +1,522 @@
+# Golden grading cases (TESTING §6.3). expected = the Jeopardy!-correct verdict.
+# 'judge' in a note marks cases expected to land in the LLM band.
+- clue_text: (clue for (Abraham) Lincoln)
+  response: (Abraham) Lincoln
+  user_response: Lincoln
+  expected: true
+  note: optional parenthetical first name
+- clue_text: (clue for (Abraham) Lincoln)
+  response: (Abraham) Lincoln
+  user_response: Abraham Lincoln
+  expected: true
+  note: parenthetical included
+- clue_text: (clue for (Abraham) Lincoln)
+  response: (Abraham) Lincoln
+  user_response: Who is Lincoln?
+  expected: true
+  note: question form
+- clue_text: (clue for the Louvre (Museum))
+  response: the Louvre (Museum)
+  user_response: the Louvre
+  expected: true
+  note: optional trailing parenthetical
+- clue_text: (clue for the Louvre (Museum))
+  response: the Louvre (Museum)
+  user_response: Louvre Museum
+  expected: true
+  note: parenthetical included, article dropped
+- clue_text: (clue for Mars (or the Red Planet))
+  response: Mars (or the Red Planet)
+  user_response: the Red Planet
+  expected: true
+  note: or-alternative
+- clue_text: (clue for Mars (or the Red Planet))
+  response: Mars (or the Red Planet)
+  user_response: Mars
+  expected: true
+  note: main response
+- clue_text: (clue for Falkland (or Malvinas) Islands)
+  response: Falkland (or Malvinas) Islands
+  user_response: Malvinas Islands
+  expected: true
+  note: mid-string or-alternative
+- clue_text: (clue for Falkland (or Malvinas) Islands)
+  response: Falkland (or Malvinas) Islands
+  user_response: the Falklands
+  expected: true
+  note: plural short form - judge
+- clue_text: (clue for Salvador Dalí)
+  response: Salvador Dalí
+  user_response: Dali
+  expected: true
+  note: accent folding, surname - judge
+- clue_text: (clue for Salvador Dalí)
+  response: Salvador Dalí
+  user_response: Salvador Dali
+  expected: true
+  note: accent folding
+- clue_text: (clue for Antônio Carlos Jobim)
+  response: Antônio Carlos Jobim
+  user_response: Antonio Carlos Jobim
+  expected: true
+  note: accent folding
+- clue_text: (clue for "Thriller")
+  response: '"Thriller"'
+  user_response: What is Thriller?
+  expected: true
+  note: quotes stripped
+- clue_text: (clue for Paris)
+  response: Paris
+  user_response: PARIS
+  expected: true
+  note: case
+- clue_text: (clue for Paris)
+  response: Paris
+  user_response: paris!
+  expected: true
+  note: punctuation
+- clue_text: (clue for the Missouri)
+  response: the Missouri
+  user_response: Missouri River
+  expected: true
+  note: more specific but same thing - judge
+- clue_text: (clue for know/no)
+  response: know/no
+  user_response: 'no'
+  expected: true
+  note: slash alternatives
+- clue_text: (clue for St. Louis)
+  response: St. Louis
+  user_response: Saint Louis
+  expected: true
+  note: abbreviation expansion - judge
+- clue_text: (clue for rock & roll)
+  response: rock & roll
+  user_response: rock and roll
+  expected: true
+  note: ampersand
+- clue_text: (clue for Dr. Seuss)
+  response: Dr. Seuss
+  user_response: Doctor Seuss
+  expected: true
+  note: title abbreviation - judge
+- clue_text: (clue for Fyodor Dostoevsky)
+  response: Fyodor Dostoevsky
+  user_response: Dostoyevsky
+  expected: true
+  note: transliteration variant, surname
+- clue_text: (clue for Dostoevsky)
+  response: Dostoevsky
+  user_response: Dostoyevsky
+  expected: true
+  note: transliteration variant
+- clue_text: (clue for Tchaikovsky)
+  response: Tchaikovsky
+  user_response: Chaikovsky
+  expected: true
+  note: transliteration variant
+- clue_text: (clue for Tchaikovsky)
+  response: Tchaikovsky
+  user_response: Tschaikowsky
+  expected: true
+  note: German transliteration
+- clue_text: (clue for Muammar Gaddafi)
+  response: Muammar Gaddafi
+  user_response: Qaddafi
+  expected: true
+  note: transliteration
+- clue_text: (clue for Mohammed)
+  response: Mohammed
+  user_response: Muhammad
+  expected: true
+  note: transliteration
+- clue_text: (clue for Beijing)
+  response: Beijing
+  user_response: Peking
+  expected: true
+  note: older name - judge
+- clue_text: (clue for Nostradamus)
+  response: Nostradamus
+  user_response: Nostradamas
+  expected: true
+  note: misspelling
+- clue_text: (clue for Michelangelo)
+  response: Michelangelo
+  user_response: Michaelangelo
+  expected: true
+  note: common misspelling
+- clue_text: (clue for Mississippi)
+  response: Mississippi
+  user_response: Missisippi
+  expected: true
+  note: misspelling
+- clue_text: (clue for Albuquerque)
+  response: Albuquerque
+  user_response: Albuquerqe
+  expected: true
+  note: misspelling
+- clue_text: (clue for Schwarzenegger)
+  response: Schwarzenegger
+  user_response: Schwarzeneger
+  expected: true
+  note: misspelling
+- clue_text: (clue for Leonardo da Vinci)
+  response: Leonardo da Vinci
+  user_response: da Vinci
+  expected: true
+  note: surname form
+- clue_text: (clue for Ludwig van Beethoven)
+  response: Ludwig van Beethoven
+  user_response: Beethoven
+  expected: true
+  note: surname
+- clue_text: (clue for Wolfgang Amadeus Mozart)
+  response: Wolfgang Amadeus Mozart
+  user_response: Mozart
+  expected: true
+  note: surname
+- clue_text: (clue for Edgar Allan Poe)
+  response: Edgar Allan Poe
+  user_response: Poe
+  expected: true
+  note: surname
+- clue_text: (clue for George Washington)
+  response: George Washington
+  user_response: Washington
+  expected: true
+  note: surname
+- clue_text: (clue for William Shakespeare)
+  response: William Shakespeare
+  user_response: Shakespeare
+  expected: true
+  note: surname
+- clue_text: (clue for Charles Dickens)
+  response: Charles Dickens
+  user_response: Dickens
+  expected: true
+  note: surname
+- clue_text: (clue for Jane Austen)
+  response: Jane Austen
+  user_response: Austen
+  expected: true
+  note: surname
+- clue_text: (clue for Pablo Picasso)
+  response: Pablo Picasso
+  user_response: Picasso
+  expected: true
+  note: surname
+- clue_text: (clue for Isaac Newton)
+  response: Isaac Newton
+  user_response: Sir Isaac Newton
+  expected: true
+  note: title added
+- clue_text: (clue for Albert Einstein)
+  response: Albert Einstein
+  user_response: Einstein
+  expected: true
+  note: surname
+- clue_text: (clue for Marie Curie)
+  response: Marie Curie
+  user_response: Madame Curie
+  expected: true
+  note: common form - judge
+- clue_text: (clue for John Adams)
+  response: John Adams
+  user_response: John
+  expected: false
+  note: first name alone
+- clue_text: (clue for Abraham Lincoln)
+  response: Abraham Lincoln
+  user_response: Abraham
+  expected: false
+  note: first name alone
+- clue_text: (clue for Abraham Lincoln)
+  response: Abraham Lincoln
+  user_response: a president
+  expected: false
+  note: too vague
+- clue_text: (clue for a cardinal)
+  response: a cardinal
+  user_response: a bird
+  expected: false
+  note: too vague
+- clue_text: This president created the New Deal
+  response: Franklin D. Roosevelt
+  user_response: Roosevelt
+  expected: false
+  note: ambiguous surname (two Roosevelt presidents) - judge
+- clue_text: (clue for John Quincy Adams)
+  response: John Quincy Adams
+  user_response: John Adams
+  expected: false
+  note: wrong Adams
+- clue_text: He was president on 9/11
+  response: George W. Bush
+  user_response: Bush
+  expected: false
+  note: ambiguous surname - judge
+- clue_text: (clue for the Pacific Ocean)
+  response: the Pacific Ocean
+  user_response: an ocean
+  expected: false
+  note: too vague
+- clue_text: (clue for Mount Everest)
+  response: Mount Everest
+  user_response: a mountain
+  expected: false
+  note: too vague
+- clue_text: (clue for Ernest Hemingway)
+  response: Ernest Hemingway
+  user_response: Ernest
+  expected: false
+  note: first name alone
+- clue_text: (clue for sausages)
+  response: sausages
+  user_response: sausage
+  expected: true
+  note: singular vs plural
+- clue_text: (clue for a kitten)
+  response: a kitten
+  user_response: kittens
+  expected: true
+  note: plural
+- clue_text: (clue for geese)
+  response: geese
+  user_response: goose
+  expected: true
+  note: irregular plural - judge
+- clue_text: (clue for the Beatles)
+  response: the Beatles
+  user_response: Beatles
+  expected: true
+  note: article
+- clue_text: (clue for mice)
+  response: mice
+  user_response: mouse
+  expected: true
+  note: irregular plural - judge
+- clue_text: (clue for Nineteen Eighty-Four)
+  response: Nineteen Eighty-Four
+  user_response: '1984'
+  expected: true
+  note: numeral vs words
+- clue_text: (clue for 1984)
+  response: '1984'
+  user_response: Nineteen Eighty-Four
+  expected: true
+  note: words vs numeral
+- clue_text: (clue for 12)
+  response: '12'
+  user_response: twelve
+  expected: true
+  note: cardinal
+- clue_text: (clue for Apollo 11)
+  response: Apollo 11
+  user_response: Apollo eleven
+  expected: true
+  note: number in name
+- clue_text: (clue for the 19th Amendment)
+  response: the 19th Amendment
+  user_response: the nineteenth amendment
+  expected: true
+  note: ordinal
+- clue_text: (clue for Henry VIII)
+  response: Henry VIII
+  user_response: Henry the Eighth
+  expected: true
+  note: roman numeral vs words - judge
+- clue_text: (clue for Louis XIV)
+  response: Louis XIV
+  user_response: Louis 14
+  expected: true
+  note: roman vs digits - judge
+- clue_text: (clue for Catch-22)
+  response: Catch-22
+  user_response: Catch 22
+  expected: true
+  note: hyphenated number
+- clue_text: (clue for 1812)
+  response: '1812'
+  user_response: '1814'
+  expected: false
+  note: different year
+- clue_text: (clue for Henry V)
+  response: Henry V
+  user_response: Henry IV
+  expected: false
+  note: different king
+- clue_text: (clue for Super Bowl XL)
+  response: Super Bowl XL
+  user_response: Super Bowl XLI
+  expected: false
+  note: different numeral
+- clue_text: (clue for 7)
+  response: '7'
+  user_response: seven
+  expected: true
+  note: digit vs word
+- clue_text: (clue for John F. Kennedy)
+  response: John F. Kennedy
+  user_response: JFK
+  expected: true
+  note: initials - judge
+- clue_text: (clue for the United States)
+  response: the United States
+  user_response: U.S.
+  expected: true
+  note: abbreviation - judge
+- clue_text: (clue for the United Nations)
+  response: the United Nations
+  user_response: the UN
+  expected: true
+  note: initialism - judge
+- clue_text: (clue for NASA)
+  response: NASA
+  user_response: National Aeronautics and Space Administration
+  expected: true
+  note: expansion - judge
+- clue_text: (clue for Franklin Delano Roosevelt)
+  response: Franklin Delano Roosevelt
+  user_response: FDR
+  expected: true
+  note: initials - judge
+- clue_text: (clue for U.S.A.)
+  response: U.S.A.
+  user_response: USA
+  expected: true
+  note: periods
+- clue_text: (clue for Washington, D.C.)
+  response: Washington, D.C.
+  user_response: Washington DC
+  expected: true
+  note: periods and comma
+- clue_text: (clue for Australia)
+  response: Australia
+  user_response: Austria
+  expected: false
+  note: near-spelling, different country
+- clue_text: (clue for Austria)
+  response: Austria
+  user_response: Australia
+  expected: false
+  note: near-spelling, different country
+- clue_text: (clue for Andrew Jackson)
+  response: Andrew Jackson
+  user_response: Johnson
+  expected: false
+  note: different president
+- clue_text: (clue for Andrew Johnson)
+  response: Andrew Johnson
+  user_response: Jackson
+  expected: false
+  note: different president
+- clue_text: (clue for Russia)
+  response: Russia
+  user_response: Prussia
+  expected: false
+  note: near-spelling, different state
+- clue_text: (clue for Iran)
+  response: Iran
+  user_response: Iraq
+  expected: false
+  note: one letter, different country
+- clue_text: (clue for Mali)
+  response: Mali
+  user_response: Bali
+  expected: false
+  note: one letter, different place
+- clue_text: (clue for Sweden)
+  response: Sweden
+  user_response: Swede
+  expected: false
+  note: nationality vs country - judge
+- clue_text: (clue for Slovakia)
+  response: Slovakia
+  user_response: Slovenia
+  expected: false
+  note: similar names
+- clue_text: (clue for Niger)
+  response: Niger
+  user_response: Nigeria
+  expected: false
+  note: similar names
+- clue_text: (clue for Guinea)
+  response: Guinea
+  user_response: Guyana
+  expected: false
+  note: similar names
+- clue_text: (clue for Monet)
+  response: Monet
+  user_response: Manet
+  expected: false
+  note: different painter
+- clue_text: (clue for Jefferson)
+  response: Jefferson
+  user_response: Jackson
+  expected: false
+  note: different president
+- clue_text: (clue for Hydrogen)
+  response: Hydrogen
+  user_response: Helium
+  expected: false
+  note: different element
+- clue_text: (clue for Mercury)
+  response: Mercury
+  user_response: Venus
+  expected: false
+  note: different planet
+- clue_text: (clue for Lincoln)
+  response: Lincoln
+  user_response: Lincoln Memorial
+  expected: false
+  note: more specific thing that is different - judge
+- clue_text: (clue for Pluto)
+  response: Pluto
+  user_response: Plato
+  expected: false
+  note: near-spelling, different thing
+- clue_text: (clue for Caesar)
+  response: Caesar
+  user_response: Cesar Chavez
+  expected: false
+  note: different person
+- clue_text: (clue for Hamlet)
+  response: Hamlet
+  user_response: Macbeth
+  expected: false
+  note: different play
+- clue_text: (clue for Genesis)
+  response: Genesis
+  user_response: Exodus
+  expected: false
+  note: different book
+- clue_text: (clue for Gold)
+  response: Gold
+  user_response: Silver
+  expected: false
+  note: different element
+- clue_text: (clue for Aida)
+  response: Aida
+  user_response: Otello
+  expected: false
+  note: different opera
+- clue_text: (clue for Paris)
+  response: Paris
+  user_response: Rome
+  expected: false
+  note: different city
+- clue_text: (clue for Jonah)
+  response: Jonah
+  user_response: Noah
+  expected: false
+  note: different prophet
+- clue_text: (clue for Paris)
+  response: Paris
+  user_response: ''
+  expected: false
+  note: blank
+- clue_text: (clue for Paris)
+  response: Paris
+  user_response: pass
+  expected: false
+  note: explicit pass
