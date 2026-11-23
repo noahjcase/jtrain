@@ -1,0 +1,92 @@
+# jtrainer configuration. Every tunable lives here; code reads it via jtrainer.config.
+
+[paths]
+db = "data/jtrainer.duckdb"
+raw_dir = "data/raw"
+html_cache = "data/html_cache"
+taxonomy_dir = "taxonomy"
+
+[ingest]
+# Notes patterns (case-insensitive regex) that mark non-standard-difficulty matches.
+# These are excluded from default sampling. Tournament of Champions etc. are NOT flagged:
+# they are adult-level material and good preparation.
+tournament_patterns = [
+  "\\bkids?\\b", "\\bteen\\b", "\\bcollege\\b", "back to school", "high school",
+  "\\bcelebrity\\b", "power players",
+]
+# Clue-text patterns that indicate the clue depends on media the user cannot see/hear.
+media_patterns = [
+  "clue crew",
+  "\\b(seen|heard|shown|pictured|displayed|played) here\\b",
+  "\\b(seen|shown) (on|in) (the|this) (monitor|video|map|photo|picture)\\b",
+  "\\bin this (video|clip|photo|picture)\\b",
+  "\\bon the monitor\\b",
+  "\\bas you (see|hear)\\b",
+  "\\blisten (to|for) (this|these|the following)\\b",
+]
+
+[eligibility]
+include_media = false
+include_tournament = false
+include_special = false
+
+[taxonomy]
+version = "v1"
+
+[llm]
+# Model names are configuration. claude-haiku-5-5 is ~40x cheaper for bulk tagging;
+# see README for the cost estimate before running a full-corpus batch.
+judge_model = "claude-opus-5-5"
+tag_model = "claude-opus-5-5"
+effort = "low"
+judge_max_tokens = 2048
+tag_max_tokens = 2048
+batch_size = 10000
+
+[grading]
+fuzzy_high = 92        # token-sort ratio at or above -> correct
+fuzzy_low = 60         # below -> incorrect (unless a band trigger applies)
+min_len_fuzzy = 5      # responses shorter than this never fuzzy-match correct
+
+[difficulty]
+# Prior clue difficulty (logit scale, relative to the user's ability).
+j_row1 = -1.6
+row_step = 0.45
+dj_offset = 0.7
+final = 1.4
+
+[ability]
+prior_mean = 0.0
+prior_sd = 1.5
+drift_sd_per_day = 0.01   # process noise; lets ratings move as the user learns
+
+[priority]
+half_life_years = 8.0      # recency weighting for topic frequency; 0 disables decay
+target_round = 2           # difficulty the user will face on the show:
+target_row = 3             # mid-board Double Jeopardy
+
+[review]
+desired_retention = 0.9
+slow_ms = 12000            # a correct response slower than this counts as shaky
+learning_steps_minutes = []
+relearning_steps_minutes = []
+
+[sampling]
+session_length = 50
+difficulty_kernel_sd = 0.8
+
+[sampling.mix]
+priority = 0.6
+review = 0.2
+random = 0.2
+
+[confidence]
+# Probability of being correct implied by each confidence key (for calibration/Brier).
+probs = [0.3, 0.6, 0.9]
+
+[scrape]
+base_url = "https://j-archive.com"
+min_interval_s = 20.0      # at least robots.txt Crawl-delay (20s as of 2026-11)
+max_retries = 3
+backoff_s = 30.0
+user_agent = "jtrainer/0.1 (personal study tool)"

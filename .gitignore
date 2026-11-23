@@ -1,0 +1,11 @@
+data/
+.venv/
+__pycache__/
+*.pyc
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+coverage.json
+snapshot_report.html
