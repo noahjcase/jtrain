@@ -25,6 +25,7 @@ from jtrainer.config import (
     Scrape,
     Taxonomy,
 )
+from jtrainer.llm import BatchResult, LLMRequest
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SAMPLE_TSV = FIXTURES / "clues_sample.tsv"
@@ -89,3 +90,56 @@ def db() -> Iterator[duckdb.DuckDBPyConnection]:
     conn = dbmod.connect(":memory:")
     yield conn
     conn.close()
+
+
+# ---------------------------------------------------------------------------
+# fake LLM
+
+
+class FakeLLM:
+    """Same interface as the real client. Canned responses are keyed by
+    (prompt_version, input_hash); an unregistered input raises. Records every call."""
+
+    def __init__(self):
+        self.responses: dict[tuple[str, str], list[str]] = {}
+        self.calls: list[LLMRequest] = []
+        self.batches: dict[str, list[tuple[str, LLMRequest]]] = {}
+        self.batch_outcomes: dict[str, BatchResult] = {}
+
+    def register(self, request: LLMRequest, *texts: str) -> None:
+        self.responses[(request.prompt_version, request.input_hash)] = list(texts)
+
+    def complete(self, request: LLMRequest) -> str:
+        self.calls.append(request)
+        key = (request.prompt_version, request.input_hash)
+        if key not in self.responses:
+            raise AssertionError(f"FakeLLM: unregistered input for {request.prompt_version}")
+        seq = self.responses[key]
+        return seq.pop(0) if len(seq) > 1 else seq[0]
+
+    # batch interface
+    def submit_batch(self, items: list[tuple[str, LLMRequest]]) -> str:
+        batch_id = f"batch-{len(self.batches) + 1}"
+        self.batches[batch_id] = items
+        return batch_id
+
+    def batch_status(self, batch_id: str) -> str:
+        return "ended"
+
+    def batch_results(self, batch_id: str):
+        for custom_id, req in reversed(self.batches[batch_id]):  # any order
+            if custom_id in self.batch_outcomes:
+                yield self.batch_outcomes[custom_id]
+                continue
+            seq = self.responses.get((req.prompt_version, req.input_hash))
+            if seq is None:
+                yield BatchResult(custom_id, "errored", error="unregistered")
+            else:
+                yield BatchResult(
+                    custom_id, "succeeded", text=seq.pop(0) if len(seq) > 1 else seq[0]
+                )
+
+
+@pytest.fixture
+def fake_llm() -> FakeLLM:
+    return FakeLLM()
