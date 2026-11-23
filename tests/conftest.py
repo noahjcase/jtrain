@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Iterator
 from pathlib import Path
 
+import duckdb
 import numpy as np
 import pytest
 
+from jtrainer import db as dbmod
 from jtrainer.clock import FakeClock
 from jtrainer.config import (
     LLM,
@@ -71,3 +74,14 @@ def rng() -> np.random.Generator:
 @pytest.fixture
 def clock() -> FakeClock:
     return FakeClock(dt.datetime(2026, 1, 1, tzinfo=dt.UTC))
+
+
+# ---------------------------------------------------------------------------
+# database
+
+
+@pytest.fixture
+def db() -> Iterator[duckdb.DuckDBPyConnection]:
+    conn = dbmod.connect(":memory:")
+    yield conn
+    conn.close()
