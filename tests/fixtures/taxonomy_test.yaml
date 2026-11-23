@@ -1,0 +1,24 @@
+version: test-v1
+notes: Small taxonomy for tests.
+topics:
+  - id: us_presidents
+    label: U.S. Presidents
+    description: U.S. presidents and their administrations.
+  - id: world_geography
+    label: World Geography
+    description: Countries, capitals, rivers and other world geography.
+  - id: science
+    label: Science
+    description: Chemistry, physics, biology and the elements.
+  - id: arts
+    label: Arts & Literature
+    description: Art, music, opera, literature.
+  - id: bible
+    label: The Bible
+    description: Books, people and stories of the Bible.
+  - id: animals
+    label: Animals
+    description: Animals and their young.
+  - id: wordplay_other
+    label: Wordplay
+    description: Wordplay mechanics.

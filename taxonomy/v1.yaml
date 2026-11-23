@@ -1,0 +1,185 @@
+# Topic taxonomy v1: drafted by hand (DESIGN §6 step 1).
+# Expect revision after the 500-clue sample review; bump `version` when topics change.
+version: v1
+notes: Initial hand-drafted taxonomy, 56 topics.
+topics:
+  # --- History -------------------------------------------------------------
+  - id: us_presidents
+    label: U.S. Presidents
+    description: U.S. presidents and their administrations, families, elections, and first ladies.
+    examples: ["He was the only president to serve two nonconsecutive terms before 2025"]
+  - id: us_history
+    label: U.S. History
+    description: American history other than the presidency itself - colonial era, wars, Civil Rights, landmark events, Supreme Court cases.
+    examples: ["The 1803 purchase from France that doubled the size of the U.S."]
+  - id: us_government
+    label: U.S. Government & Civics
+    description: The Constitution, amendments, Congress, the courts, federal agencies, and how American government works.
+  - id: world_history_ancient
+    label: Ancient & Medieval History
+    description: World history before about 1500 - ancient Egypt, Greece, Rome, empires, the Middle Ages.
+  - id: world_history_modern
+    label: Modern World History
+    description: World history since about 1500 - revolutions, empires, the world wars, the Cold War, 20th-century leaders.
+  - id: royalty
+    label: Royalty & Monarchs
+    description: Kings, queens, royal houses and dynasties, popes as rulers, and royal history.
+  - id: military_history
+    label: Military History
+    description: Battles, generals, weapons, and military operations (when the clue is about warfare itself).
+  - id: explorers
+    label: Explorers & Exploration
+    description: Explorers, voyages, expeditions, and firsts in exploration, including space exploration milestones.
+  # --- Geography -----------------------------------------------------------
+  - id: world_capitals
+    label: World Capitals
+    description: Capital cities of countries and their identification.
+    examples: ["This capital of Peru was founded by Pizarro in 1535"]
+  - id: world_geography
+    label: World Geography
+    description: Countries, physical geography, rivers, mountains, lakes, islands, and regions of the world (other than capitals).
+  - id: us_geography
+    label: U.S. Geography & States
+    description: U.S. states, state capitals, cities, nicknames, landmarks, and physical features of the United States.
+  - id: world_cities
+    label: World Cities & Landmarks
+    description: Non-capital cities worldwide, famous buildings, monuments, and landmarks.
+  # --- Literature & language -------------------------------------------------
+  - id: shakespeare
+    label: Shakespeare
+    description: Shakespeare's plays, sonnets, characters, quotations, and life.
+  - id: novels_authors
+    label: Novels & Authors
+    description: Novels, novelists, and their characters; fiction in general (not children's books or poetry).
+  - id: poetry
+    label: Poetry & Poets
+    description: Poems, poets, verse forms, and famous lines of poetry.
+  - id: childrens_lit
+    label: Children's & Young Adult Books
+    description: Children's books, picture books, YA fiction, and their authors and characters.
+  - id: drama_theater
+    label: Drama & Theater
+    description: Plays and playwrights other than Shakespeare, Broadway, theater history.
+  - id: mythology
+    label: Mythology & Folklore
+    description: Greek, Roman, Norse, Egyptian and other mythology; legends, folklore, fairy tales.
+  - id: bible
+    label: The Bible
+    description: Books, people, places, stories and quotations of the Bible.
+  - id: religion
+    label: Religion & Philosophy
+    description: World religions other than Bible content, saints, philosophers and philosophical ideas.
+  - id: words_language
+    label: Words & Language
+    description: Vocabulary, word origins, definitions, foreign words and phrases, grammar, idioms and sayings.
+  - id: quotations
+    label: Famous Quotations
+    description: Identifying who said a famous quotation or completing it (outside Shakespeare, the Bible, and film).
+  # --- Arts -----------------------------------------------------------------------
+  - id: art_artists
+    label: Art & Artists
+    description: Painting, sculpture, artists, art movements, museums and famous works of art.
+  - id: architecture
+    label: Architecture & Design
+    description: Architects, architectural styles, design, and famous structures as architecture.
+  - id: classical_music
+    label: Classical Music
+    description: Composers, classical works, instruments, orchestras and musical terms.
+  - id: opera_ballet
+    label: Opera & Ballet
+    description: Operas, ballets, their composers, characters and plots.
+  - id: pop_music
+    label: Pop, Rock & Popular Music
+    description: Popular music of all eras - rock, pop, country, hip-hop, R&B, jazz - artists, songs and albums.
+  - id: musicals
+    label: Broadway Musicals
+    description: Stage musicals, their songs, composers and characters.
+  # --- Screen & pop culture --------------------------------------------------------
+  - id: film
+    label: Movies
+    description: Films, actors, directors, characters, movie quotes and the Oscars.
+  - id: television
+    label: Television
+    description: TV shows, characters, hosts, and TV history.
+  - id: pop_culture
+    label: Celebrities & Pop Culture
+    description: Celebrities, fads, comics and cartoons, video games, toys, advertising slogans and brands as culture.
+  - id: sports
+    label: Sports
+    description: Sports, athletes, teams, rules, the Olympics, and sports history.
+  - id: games_hobbies
+    label: Games & Hobbies
+    description: Board and card games, puzzles, crafts, hobbies and pastimes.
+  # --- Science ---------------------------------------------------------------------
+  - id: elements_chemistry
+    label: Chemistry & the Elements
+    description: Chemical elements, symbols, compounds, reactions and chemists.
+  - id: physics
+    label: Physics
+    description: Physics concepts, laws, units, physicists and inventions explained by physics.
+  - id: biology
+    label: Biology & the Human Body
+    description: Anatomy, medicine, diseases, cells, genetics and biologists.
+  - id: animals
+    label: Animals
+    description: Animals, their behavior, classification and names (including terms for young and groups).
+  - id: plants_nature
+    label: Plants & Nature
+    description: Plants, trees, flowers, fungi, and the natural environment.
+  - id: earth_science
+    label: Earth Science & Weather
+    description: Geology, rocks and minerals, volcanoes, oceans, weather and climate.
+  - id: astronomy
+    label: Astronomy & Space
+    description: Planets, stars, constellations, astronomers and space science.
+  - id: math
+    label: Math & Numbers
+    description: Mathematics, numbers, geometry, arithmetic puzzles and mathematicians.
+  - id: technology
+    label: Technology & Inventions
+    description: Inventions, inventors, computers, the internet, engineering and transportation technology.
+  # --- Society -----------------------------------------------------------------
+  - id: business
+    label: Business & Economics
+    description: Companies, brands as businesses, entrepreneurs, money, currency and economics.
+  - id: food_drink
+    label: Food & Drink
+    description: Food, cuisine, cooking, beverages, wine and cocktails.
+  - id: fashion
+    label: Fashion & Style
+    description: Clothing, fashion designers, accessories and style.
+  - id: holidays_customs
+    label: Holidays & Customs
+    description: Holidays, traditions, customs, etiquette and the calendar.
+  - id: people_misc
+    label: Notable People
+    description: Notable people not covered by a more specific topic - activists, journalists, famous figures in the news.
+  - id: current_events
+    label: Current Events & News
+    description: Recent news events, newsmakers and contemporary politics outside U.S. presidential history.
+  # --- Wordplay mechanics ----------------------------------------------------------
+  - id: wordplay_rhyme
+    label: Wordplay - Rhyme Time
+    description: Categories whose response is a rhyming pair or relies on rhymes.
+    examples: ["RHYME TIME: A pudgy feline -> a fat cat"]
+  - id: wordplay_before_after
+    label: Wordplay - Before & After
+    description: Before & After categories joining two answers on a shared word.
+  - id: wordplay_anagrams
+    label: Wordplay - Anagrams & Scrambles
+    description: Anagrams, scrambled letters, and words hidden in other words.
+  - id: wordplay_letters
+    label: Wordplay - Letter Puzzles
+    description: Puzzles constrained by letters - responses starting with given letters, letter additions/removals, spelling, "3-letter words".
+  - id: wordplay_quotes
+    label: Wordplay - Quotation-Mark Categories
+    description: Categories in quotation marks where every response contains the quoted string or a pun on it.
+  - id: wordplay_crossword
+    label: Wordplay - Crossword Clues
+    description: Crossword-clue categories giving a short definition and letter count.
+  - id: wordplay_other
+    label: Wordplay - Other
+    description: Other wordplay mechanics - homophones, compound words, hidden phrases, puns.
+  - id: potpourri
+    label: Potpourri & Miscellany
+    description: Clues that genuinely fit no topic above; use sparingly.

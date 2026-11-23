@@ -1,0 +1,3 @@
+```json
+{"topic_id": "science", "secondary_topic": null, "entity": {"canonical_name": "gold", "aliases": ["Au"]}}
+```

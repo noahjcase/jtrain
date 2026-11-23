@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import os
+import shutil
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -26,10 +27,15 @@ from jtrainer.config import (
     Scrape,
     Taxonomy,
 )
+from jtrainer.db import to_db
+from jtrainer.ingest.jwolle1 import ingest_tsv
 from jtrainer.llm import BatchResult, LLMRequest
+from jtrainer.tagging.entities import EntityResolver
+from jtrainer.tagging.taxonomy import load_taxonomy, store_taxonomy
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SAMPLE_TSV = FIXTURES / "clues_sample.tsv"
+TEST_TAXONOMY = FIXTURES / "taxonomy_test.yaml"
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +97,86 @@ def db() -> Iterator[duckdb.DuckDBPyConnection]:
     conn = dbmod.connect(":memory:")
     yield conn
     conn.close()
+
+
+# Deterministic topic assignment for the sample clues, by category.
+CATEGORY_TOPICS = {
+    "U.S. PRESIDENTS": "us_presidents",
+    "FAMOUS NAMES": "us_presidents",
+    "PEOPLE": "us_presidents",
+    "WORLD CAPITALS": "world_geography",
+    "GEOGRAPHY": "world_geography",
+    "MAPS": "world_geography",
+    "BRAZIL": "arts",
+    "THE ELEMENTS": "science",
+    "SCIENCE": "science",
+    "ART": "arts",
+    "OPERA": "arts",
+    "MUSIC": "arts",
+    "LITERATURE": "arts",
+    "NOVELS": "arts",
+    "80s MUSIC": "arts",
+    "PAINTINGS": "arts",
+    "INSTRUMENTS": "arts",
+    "MUSEUMS": "arts",
+    "THE BIBLE": "bible",
+    "ANIMALS": "animals",
+    "POTPOURRI": "wordplay_other",
+    "ODDITIES": "wordplay_other",
+    "SHIPS": "world_geography",
+    "POKER": "wordplay_other",
+    "FRUIT": "science",
+    "WORLD LEADERS": "us_presidents",
+}
+
+
+def tag_all(
+    conn: duckdb.DuckDBPyConnection,
+    version: str = "test-v1",
+    when: dt.datetime | None = None,
+    topics: dict[str, str] | None = None,
+) -> None:
+    """Tag every clue under `version` with a fixture 'model', entity from its response."""
+    resolver = EntityResolver(conn)
+    topics = topics or CATEGORY_TOPICS
+    when = when or dt.datetime(2025, 6, 1)
+    for clue_id, category, response in conn.execute(
+        "SELECT clue_id, category, response FROM clues ORDER BY clue_id"
+    ).fetchall():
+        entity = resolver.resolve(response, (), source="llm")
+        conn.execute(
+            "INSERT INTO clue_tags VALUES (?, ?, 'fixture-v1', 'fixture', ?, NULL, ?, ?)",
+            [clue_id, version, topics.get(category, "wordplay_other"), entity, to_db(when)],
+        )
+
+
+@pytest.fixture(scope="session")
+def loaded_template(tmp_path_factory) -> Path:
+    path = tmp_path_factory.mktemp("template") / "loaded.duckdb"
+    conn = dbmod.connect(path)
+    ingest_tsv(conn, SAMPLE_TSV, make_config())
+    store_taxonomy(conn, load_taxonomy(TEST_TAXONOMY))
+    tag_all(conn)
+    conn.execute("CHECKPOINT")
+    conn.close()
+    return path
+
+
+@pytest.fixture
+def db_loaded(loaded_template, tmp_path) -> Iterator[duckdb.DuckDBPyConnection]:
+    """Sample clues ingested, the test taxonomy stored, every clue tagged. A fresh copy of a
+    session-scoped template per test."""
+    path = tmp_path / "loaded.duckdb"
+    shutil.copy(loaded_template, path)
+    conn = dbmod.connect(path)
+    yield conn
+    conn.close()
+
+
+def clue_id_by_response(conn, response: str) -> int:
+    return conn.execute(
+        "SELECT clue_id FROM clues WHERE response = ? ORDER BY clue_id", [response]
+    ).fetchone()[0]
 
 
 # ---------------------------------------------------------------------------
