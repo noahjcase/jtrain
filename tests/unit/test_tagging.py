@@ -8,6 +8,7 @@ from conftest import FIXTURES, SAMPLE_TSV, TEST_TAXONOMY, clue_id_by_response, m
 
 from jtrainer.ingest.jwolle1 import ingest_tsv
 from jtrainer.llm import BatchResult, CachedLLM, parse_prompt
+from jtrainer.tagging.entities import entity_aliases
 from jtrainer.tagging.tagger import Tagger
 from jtrainer.tagging.taxonomy import (
     TaxonomyError,
@@ -83,9 +84,9 @@ def test_tag_inserts_row_with_versions(setup):
         [cid],
     ).fetchone()
     assert row[:4] == ("test-v1", "tag-v1", "test-tagger", "us_presidents")
-    assert db.execute(
-        "SELECT canonical_name, aliases FROM entities WHERE entity_id = ?", [row[4]]
-    ).fetchone() == ("Abraham Lincoln", ["Lincoln", "Honest Abe"])
+    name = db.execute("SELECT canonical_name FROM entities WHERE entity_id = ?", [row[4]])
+    assert name.fetchone() == ("Abraham Lincoln",)
+    assert entity_aliases(db, row[4]) == ["Lincoln", "Honest Abe"]
 
 
 def test_retag_new_version_inserts_and_keeps_old(setup, clock):

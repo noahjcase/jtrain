@@ -8,6 +8,7 @@ import pytest
 from conftest import SAMPLE_TSV, TEST_TAXONOMY
 
 from jtrainer.cli import main
+from jtrainer.db import migrations
 from jtrainer.ingest import jwolle1
 
 
@@ -32,7 +33,7 @@ def test_ingest_taxonomy_stats_info(cfg_path, capsys):
     assert "attempts 0" in capsys.readouterr().out
     assert main(["--config", str(cfg_path), "info"]) == 0
     info = json.loads(capsys.readouterr().out)
-    assert info["clues"] == 53 and info["schema_version"] == 5
+    assert info["clues"] == 53 and info["schema_version"] == len(migrations())
     assert main(["--config", str(cfg_path), "tag", "status"]) == 0
     assert "0 clues tagged" in capsys.readouterr().out
 

@@ -5,6 +5,9 @@ resolved first, so "(Abraham) Lincoln" and "Abraham Lincoln" share one entity. A
 are *not* used as match keys (a "Lincoln" alias must not merge Lincoln, Nebraska into the
 president); they are stored for grading. Distinct names stay distinct ("John Adams" /
 "John Quincy Adams").
+
+Aliases live in `entity_aliases` and are only ever inserted: `entities` rows are referenced
+by foreign keys, and DuckDB cannot update a list column of a referenced row.
 """
 
 from __future__ import annotations
@@ -23,12 +26,19 @@ class EntityResolver:
         if key in self._cache:
             return self._cache[key]
         row = self.conn.execute(
-            "SELECT entity_id, aliases FROM entities WHERE canonical_key = ?", [key]
+            "SELECT entity_id FROM entities WHERE canonical_key = ?", [key]
         ).fetchone()
         if row:
-            self._cache[key] = (row[0], list(row[1] or []))
+            self._cache[key] = (row[0], entity_aliases(self.conn, row[0]))
             return self._cache[key]
         return None
+
+    def _add_aliases(self, entity_id: int, start: int, aliases: list[str]) -> None:
+        if aliases:
+            self.conn.executemany(
+                "INSERT INTO entity_aliases VALUES (?, ?, ?)",
+                [[entity_id, start + i, a] for i, a in enumerate(aliases)],
+            )
 
     def resolve(
         self, canonical_name: str, aliases: list[str] | tuple[str, ...] = (), source: str = "llm"
@@ -41,21 +51,20 @@ class EntityResolver:
         if found is None:
             clean_aliases = self._new_aliases(key, [], aliases)
             entity_id = self.conn.execute(
-                "INSERT INTO entities (canonical_name, canonical_key, aliases, source) "
-                "VALUES (?, ?, ?, ?) RETURNING entity_id",
-                [name, key, clean_aliases, source],
+                "INSERT INTO entities (canonical_name, canonical_key, source) "
+                "VALUES (?, ?, ?) RETURNING entity_id",
+                [name, key, source],
             ).fetchone()[0]
+            self._add_aliases(entity_id, 0, clean_aliases)
             self._cache[key] = (entity_id, clean_aliases)
             return entity_id
         entity_id, existing = found
         additions = self._new_aliases(key, existing, aliases)
         if additions:
-            merged = existing + additions
-            self.conn.execute(
-                "UPDATE entities SET aliases = ? WHERE entity_id = ?", [merged, entity_id]
-            )
-            self._cache[key] = (entity_id, merged)
+            self._add_aliases(entity_id, len(existing), additions)
+            self._cache[key] = (entity_id, existing + additions)
         if source == "llm":
+            # Scalar, unindexed columns update in place, so this is safe on referenced rows.
             self.conn.execute(
                 "UPDATE entities SET source = 'llm', canonical_name = ? "
                 "WHERE entity_id = ? AND source = 'heuristic'",
@@ -79,6 +88,14 @@ class EntityResolver:
         if not response_key(response):
             return None
         return self.resolve(response, (), source="heuristic")
+
+
+def entity_aliases(conn: duckdb.DuckDBPyConnection, entity_id: int) -> list[str]:
+    """An entity's aliases in the order they were added."""
+    rows = conn.execute(
+        "SELECT alias FROM entity_aliases WHERE entity_id = ? ORDER BY position", [entity_id]
+    ).fetchall()
+    return [r[0] for r in rows]
 
 
 def entity_for_clue(
@@ -109,13 +126,13 @@ def aliases_for_clue(
     from jtrainer.tagging.taxonomy import current_tags_sql
 
     row = conn.execute(
-        f"SELECT e.canonical_name, e.aliases FROM ({current_tags_sql(taxonomy_version)}) t "
+        f"SELECT e.entity_id, e.canonical_name FROM ({current_tags_sql(taxonomy_version)}) t "
         "JOIN entities e USING (entity_id) WHERE t.clue_id = ?",
         [clue_id],
     ).fetchone()
     if not row:
         return []
-    return [row[0], *(row[1] or [])]
+    return [row[1], *entity_aliases(conn, row[0])]
 
 
 def clues_for_entity(
@@ -125,7 +142,7 @@ def clues_for_entity(
     from jtrainer.tagging.taxonomy import current_tags_sql
 
     row = conn.execute(
-        "SELECT canonical_key, aliases FROM entities WHERE entity_id = ?", [entity_id]
+        "SELECT canonical_key FROM entities WHERE entity_id = ?", [entity_id]
     ).fetchone()
     if not row:
         return []
