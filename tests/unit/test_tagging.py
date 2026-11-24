@@ -223,3 +223,25 @@ def test_sample_selection_is_deterministic(setup, rng):
     a = tagger.sample_clue_ids(5, np.random.default_rng(1))
     b = tagger.sample_clue_ids(5, np.random.default_rng(1))
     assert a == b and len(a) == 5
+
+
+def test_interrupted_sample_resumes_same_clues(setup):
+    """Tagging part of a sample must not change which clues the same seed selects; the
+    rerun skips the tagged ones and makes no LLM calls for them."""
+    import numpy as np
+
+    _, tagger, llm = setup
+    ids = tagger.sample_clue_ids(6, np.random.default_rng(3))
+    reply = '{"topic_id": "science", "secondary_topic": null, '
+    for cid in ids:
+        name = f"entity {cid}"
+        llm.register(
+            tagger.request_for(cid),
+            reply + f'"entity": {{"canonical_name": "{name}", "aliases": []}}}}',
+        )
+    tagger.tag_clues(ids[:4])  # the run that was interrupted
+    calls = len(llm.calls)
+    assert tagger.sample_clue_ids(6, np.random.default_rng(3)) == ids
+    report = tagger.tag_clues(ids)
+    assert report.already_tagged == 4 and report.tagged == 2
+    assert len(llm.calls) == calls + 2

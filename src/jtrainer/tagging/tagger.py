@@ -45,6 +45,7 @@ class TagRunReport:
     tagged: int = 0
     from_cache: int = 0
     submitted: int = 0
+    already_tagged: int = 0
     failed: Counter = field(default_factory=Counter)
     retried: int = 0
 
@@ -185,6 +186,7 @@ class Tagger:
     def tag_clue(self, clue_id: int, report: TagRunReport | None = None) -> bool:
         report = report or TagRunReport()
         if self._already_tagged(clue_id):
+            report.already_tagged += 1
             return True
         req = self.request_for(clue_id)
         cached = self.llm.cached_text(req) is not None
@@ -212,23 +214,30 @@ class Tagger:
     # -- selection -------------------------------------------------------------
 
     def untagged_clue_ids(
-        self, limit: int | None = None, include_ineligible: bool = False
+        self,
+        limit: int | None = None,
+        include_ineligible: bool = False,
+        include_tagged: bool = False,
     ) -> list[int]:
         where = (
             ""
             if include_ineligible
             else ("AND NOT c.needs_media AND NOT c.is_tournament AND NOT c.is_special")
         )
+        untagged = "TRUE" if include_tagged else "t.clue_id IS NULL"
         sql = (
             f"SELECT c.clue_id FROM clues c LEFT JOIN ({current_tags_sql(self.taxonomy.version)})"
-            f" t USING (clue_id) WHERE t.clue_id IS NULL {where} ORDER BY c.clue_id"
+            f" t USING (clue_id) WHERE {untagged} {where} ORDER BY c.clue_id"
         )
         if limit:
             sql += f" LIMIT {int(limit)}"
         return [r[0] for r in self.conn.execute(sql).fetchall()]
 
     def sample_clue_ids(self, n: int, rng: np.random.Generator) -> list[int]:
-        pool = np.array(self.untagged_clue_ids(), dtype=np.int64)
+        """A sample of eligible clues, tagged or not, so the same seed always names the same
+        clues: an interrupted run resumes (tagged clues are skipped) rather than drawing a
+        new sample. Use a different seed for a new sample."""
+        pool = np.array(self.untagged_clue_ids(include_tagged=True), dtype=np.int64)
         if len(pool) == 0:
             return []
         picks = rng.choice(pool, size=min(n, len(pool)), replace=False)

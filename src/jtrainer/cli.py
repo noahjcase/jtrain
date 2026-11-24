@@ -136,11 +136,11 @@ def cmd_tag(cfg: Config, args) -> int:
     tagger = _tagger(cfg, conn, client)
     if args.tag_cmd == "sample":
         ids = tagger.sample_clue_ids(args.n, np.random.default_rng(args.seed))
-        print(f"tagging {len(ids)} sampled clues with {cfg.llm.tag_model}...")
+        print(f"tagging {len(ids)} sampled clues (seed {args.seed}) with {cfg.llm.tag_model}...")
         report = tagger.tag_clues(ids)
         print(
             f"tagged {report.tagged} ({report.from_cache} from cache); "
-            f"failures {dict(report.failed)}"
+            f"{report.already_tagged} already tagged; failures {dict(report.failed)}"
         )
         print("Review them in the TUI: `jtrain`, then t.")
     elif args.tag_cmd == "submit":
