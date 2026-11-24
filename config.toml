@@ -37,7 +37,7 @@ version = "v1"
 # Model names are configuration. claude-haiku-5-5 is ~40x cheaper for bulk tagging;
 # see README for the cost estimate before running a full-corpus batch.
 judge_model = "claude-opus-5-5"
-tag_model = "claude-opus-5-5"
+tag_model = "claude-haiku-5-5"
 effort = "low"
 judge_max_tokens = 2048
 tag_max_tokens = 2048

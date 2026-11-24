@@ -63,7 +63,7 @@ class Taxonomy:
 @dataclass
 class LLM:
     judge_model: str = "claude-opus-5-5"
-    tag_model: str = "claude-opus-5-5"
+    tag_model: str = "claude-haiku-5-5"
     effort: str = "low"
     judge_max_tokens: int = 2048
     tag_max_tokens: int = 2048
