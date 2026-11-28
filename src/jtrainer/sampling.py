@@ -5,7 +5,10 @@
   probability is the clue's *marginal* probability under the mixture, so inverse
   probability weighting over attempts recovers accuracy on a uniform board.
   Unavailable components (no tags yet, no due reviews) have their share redistributed
-  proportionally over the available ones.
+  proportionally over the available ones. With `recency_half_life_years` > 0 the priority
+  and random components weight each clue by 2^(-age / half-life), age measured from the
+  newest eligible clue: topic shares are unchanged, the clue within a topic tilts toward
+  recent seasons. Every clue keeps a positive probability, so IPW stays unbiased.
 - ReviewSampler: due FSRS entities only; prob = 1/k over the entity's candidate clues.
 
 No clue repeats within a session until the eligible pool is exhausted.
@@ -36,13 +39,24 @@ class Pick:
 class Pool:
     """Eligible clues as parallel numpy arrays, plus the session's served mask."""
 
-    def __init__(self, ids: np.ndarray, topic_idx: np.ndarray, b: np.ndarray, topics: list[str]):
+    def __init__(
+        self,
+        ids: np.ndarray,
+        topic_idx: np.ndarray,
+        b: np.ndarray,
+        topics: list[str],
+        age_years: np.ndarray | None = None,
+    ):
         order = np.argsort(ids, kind="stable")
         self.ids = np.asarray(ids, dtype=np.int64)[order]
         self.topic_idx = np.asarray(topic_idx, dtype=np.int64)[order]
         self.b = np.asarray(b, dtype=np.float64)[order]
         self.topics = list(topics)
+        # Years before the newest clue in the pool (0 = newest).
+        age = np.zeros(len(self.ids)) if age_years is None else np.asarray(age_years, float)
+        self.age_years = age[order]
         self.served = np.zeros(len(self.ids), dtype=bool)
+        self._recency: dict[float, np.ndarray] = {}
 
     @classmethod
     def from_db(cls, conn: duckdb.DuckDBPyConnection, config: Config) -> Pool:
@@ -50,7 +64,8 @@ class Pool:
         res = conn.execute(
             f"""
             SELECT c.clue_id, COALESCE(t.topic_id, '') AS topic,
-                   {clue_difficulty_sql(config.difficulty)} AS b
+                   {clue_difficulty_sql(config.difficulty)} AS b,
+                   date_diff('day', c.air_date, max(c.air_date) OVER ()) / 365.25 AS age
             FROM clues c
             LEFT JOIN clue_difficulty d USING (clue_id)
             LEFT JOIN ({current_tags_sql(version)}) t USING (clue_id)
@@ -61,10 +76,27 @@ class Pool:
         topics = sorted({t for t in topic_col if t})
         lookup = {t: i for i, t in enumerate(topics)}
         topic_idx = np.array([lookup.get(t, -1) for t in topic_col], dtype=np.int64)
-        return cls(np.asarray(res["clue_id"]), topic_idx, np.asarray(res["b"], dtype=float), topics)
+        age = np.asarray(res["age"], dtype=float)  # masked NULLs become nan
+        if np.isnan(age).any():  # undated clues count as the oldest
+            age[np.isnan(age)] = np.nanmax(age) if (~np.isnan(age)).any() else 0.0
+        return cls(
+            np.asarray(res["clue_id"]),
+            topic_idx,
+            np.asarray(res["b"], dtype=float),
+            topics,
+            age,
+        )
 
     def __len__(self) -> int:
         return len(self.ids)
+
+    def recency_weights(self, half_life_years: float) -> np.ndarray:
+        """2^(-age / half-life) per clue; all ones when the half-life is 0 (disabled)."""
+        if half_life_years <= 0:
+            return np.ones(len(self.ids))
+        if half_life_years not in self._recency:
+            self._recency[half_life_years] = np.exp2(-self.age_years / half_life_years)
+        return self._recency[half_life_years]
 
     def index_of(self, clue_id: int) -> int | None:
         i = int(np.searchsorted(self.ids, clue_id))
@@ -155,6 +187,7 @@ class AdaptiveSampler:
         ability: Callable[[], AbilityModel],
         priorities: Callable[[], dict[str, float]],
         review_source: ReviewSource | None = None,
+        recency_half_life_years: float = 0.0,
     ):
         self.pool = pool
         self.rng = rng
@@ -163,6 +196,7 @@ class AdaptiveSampler:
         self.ability = ability
         self.priorities = priorities
         self.review_source = review_source
+        self.recency = pool.recency_weights(recency_half_life_years)
 
     def _priority_component(self, avail: np.ndarray) -> np.ndarray | None:
         pool = self.pool
@@ -176,7 +210,7 @@ class AdaptiveSampler:
             return None
         tidx = pool.topic_idx[m]
         w = np.exp(-((pool.b[m] - mu[tidx]) ** 2) / (2 * self.kernel_sd**2))
-        w = np.maximum(w, 1e-12)
+        w = np.maximum(w, 1e-12) * self.recency[m]
         w_topic = np.bincount(tidx, weights=w, minlength=len(pool.topics))
         pi = np.array([max(0.0, prio.get(t, 0.0)) for t in pool.topics])
         pi[w_topic == 0] = 0.0
@@ -215,7 +249,8 @@ class AdaptiveSampler:
             if got is not None:
                 comps["review"], review_entity = got
         if self.mix.get("random", 0) > 0 or not comps:
-            comps["random"] = avail / avail.sum()
+            r = avail * self.recency
+            comps["random"] = r / r.sum()
         raw = {k: self.mix.get(k, 0.0) for k in comps}
         if sum(raw.values()) <= 0:
             raw = {"random": 1.0}

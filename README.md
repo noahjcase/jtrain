@@ -22,7 +22,7 @@ Without it everything still works: borderline answers ask you to decide (`y`/`n`
 | Key on home | Mode |
 |---|---|
 | `r` | Random quiz: uniform over eligible clues (the unbiased baseline) |
-| `a` | Adaptive: 60% topic priority, 20% due reviews, 20% random (see `config.toml`) |
+| `a` | Adaptive: 60% topic priority, 20% due reviews, 20% random, favouring recent seasons (see `config.toml`) |
 | `v` | Spaced review: missed facts, shown through a *different* clue when one exists |
 | `g` | Game: a full archived game (`a`) or a synthesized board (`s`), with wagering and Coryat |
 | `s` | Stats: accuracy (naive and IPW-corrected), ability ± uncertainty, priorities, timing, calibration |
@@ -102,6 +102,12 @@ suite nightly.
   and when nothing suggests a different thing (first letter, numerals, roman numerals).
   Partial names, initialisms and number variants go to the judge instead of failing. On
   the 104-case golden set, no case is graded confidently wrong; about half need the judge.
+- **Recency in adaptive mode.** `sampling.recency_half_life_years` (default 10) halves a
+  clue's weight for every 10 years before the newest clue, in the priority and random
+  parts of adaptive sessions. Topic shares are unchanged; within a topic, recent clues come
+  up more often. On the full archive, 2021-2026 goes from 16% of draws to 38%, and
+  1984-2000 from 38% to 11%. 0 turns it off. Random mode stays uniform, and IPW stats stay
+  unbiased because each pick records its exact probability.
 - **Review before tagging.** Spaced review works from day one. Until the LLM supplies
   entities, a clue's entity is its normalized response with parentheticals resolved.
 - **Difficulty.** Clue difficulty comes from round × board row until `fit-irt` has

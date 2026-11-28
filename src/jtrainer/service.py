@@ -219,6 +219,7 @@ class StudyService:
                 lambda: self.ability,
                 self.topic_priorities,
                 scheduler_review_source(self.review),
+                self.config.sampling.recency_half_life_years,
             )
         raise ValueError(f"mode {self.mode!r} has no clue sampler")
 

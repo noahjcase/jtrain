@@ -59,6 +59,7 @@ def make_config(tmp: Path | None = None) -> Config:
         sampling=Sampling(
             session_length=50,
             difficulty_kernel_sd=0.8,
+            recency_half_life_years=0.0,
             mix={"priority": 0.6, "review": 0.2, "random": 0.2},
         ),
         scrape=Scrape(

@@ -111,6 +111,9 @@ class Review:
 class Sampling:
     session_length: int = 50
     difficulty_kernel_sd: float = 0.8
+    # Adaptive mode: a clue's weight halves for every this-many years before the newest
+    # clue. 0 disables (every season equal). The random mode is always uniform.
+    recency_half_life_years: float = 10.0
     mix: dict[str, float] = field(
         default_factory=lambda: {"priority": 0.6, "review": 0.2, "random": 0.2}
     )
@@ -162,6 +165,8 @@ class Config:
         mix = cfg.sampling.mix
         if abs(sum(mix.values()) - 1.0) > 1e-9:
             raise ValueError(f"[sampling.mix] must sum to 1, got {mix}")
+        if cfg.sampling.recency_half_life_years < 0:
+            raise ValueError("[sampling] recency_half_life_years must be >= 0 (0 disables)")
         return cfg
 
     @classmethod

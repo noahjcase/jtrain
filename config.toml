@@ -74,6 +74,10 @@ relearning_steps_minutes = []
 [sampling]
 session_length = 50
 difficulty_kernel_sd = 0.8
+# Adaptive mode favours recent seasons: a clue's weight halves for every this-many years
+# before the newest clue (10: a 2016 clue is half as likely as a 2026 one, a 1996 clue an
+# eighth). 0 treats every season equally. Random mode (r) is always uniform.
+recency_half_life_years = 10.0
 
 [sampling.mix]
 priority = 0.6

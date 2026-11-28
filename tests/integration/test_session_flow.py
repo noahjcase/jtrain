@@ -2,6 +2,7 @@
 
 import json
 
+import numpy as np
 import pytest
 from conftest import clue_id_by_response, make_config
 
@@ -154,6 +155,16 @@ def test_judge_called_for_band(db_loaded, clock, rng, fake_llm):
     )
     out = service.submit(p, "Austria", 2, 300, 900)
     assert out.verdict.grader == "llm" and out.verdict.correct is False
+
+
+def test_adaptive_uses_configured_recency(db_loaded, clock, rng, fake_llm):
+    cfg = make_config()
+    cfg.sampling.recency_half_life_years = 10.0
+    svc = StudyService(db_loaded, cfg, clock, rng, fake_llm)
+    svc.start_session("adaptive")
+    sampler = svc._make_sampler()
+    assert sampler.recency == pytest.approx(np.exp2(-svc.pool.age_years / 10.0))
+    assert svc.next_clue().pick.prob > 0
 
 
 def test_session_summary(service, clock):

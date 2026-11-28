@@ -26,6 +26,13 @@ def test_mix_must_sum_to_one(tmp_path):
         Config.load(p)
 
 
+def test_negative_recency_half_life_rejected(tmp_path):
+    p = tmp_path / "c.toml"
+    p.write_text("[sampling]\nrecency_half_life_years = -1\n")
+    with pytest.raises(ValueError, match="recency_half_life_years"):
+        Config.load(p)
+
+
 def test_missing_file_gives_defaults(tmp_path):
     assert Config.load(tmp_path / "none.toml").grading == Config().grading
 
